@@ -14,7 +14,7 @@ import httpContext from "express-http-context"; // Must be first!
 import session from "express-session";
 import { connectToDatabase } from "./config/mongoose.js";
 import { morganLogger } from "./config/morgan.js";
-// TODO: Substitute the current in-memory session store with a persistent session store, such as Redis.
+import { connectToRabbitMq } from "./config/rabbitMq.js";
 import { sessionOptions } from "./config/sessionOptions.js";
 import { logger } from "./config/winston.js";
 import { router } from "./routes/router.js";
@@ -22,6 +22,9 @@ import { router } from "./routes/router.js";
 try {
 	// Connect to MongoDB.
 	await connectToDatabase(process.env.DB_CONNECTION_STRING);
+
+	// Connect to RabbitMQ.
+	await connectToRabbitMq();
 
 	// Creates an Express application.
 	const app = express();

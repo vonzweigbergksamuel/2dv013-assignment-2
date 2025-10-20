@@ -5,6 +5,7 @@
  * @version 3.1.0
  */
 
+import { publishMessage } from "../config/rabbitMq.js";
 import { logger } from "../config/winston.js";
 import { TaskModel } from "../models/TaskModel.js";
 
@@ -91,12 +92,17 @@ export class TaskController {
 
 			const { description, done } = req.body;
 
-			await TaskModel.create({
+			const task = await TaskModel.create({
 				description,
 				done: done === "on",
 			});
 
 			logger.silly("Created new task document");
+
+			await publishMessage({
+				event_type: "task_created",
+				id: task.id,
+			});
 
 			req.session.flash = {
 				type: "success",
@@ -135,6 +141,9 @@ export class TaskController {
 				body: req.body,
 			});
 
+			const wasDoneModified =
+				"done" in req.body && req.doc.done !== (req.body.done === "on");
+
 			if ("description" in req.body) {
 				req.doc.description = req.body.description;
 			}
@@ -145,6 +154,17 @@ export class TaskController {
 			if (req.doc.isModified()) {
 				await req.doc.save();
 				logger.silly("Updated task document", { id: req.doc.id });
+
+				if (wasDoneModified) {
+					const eventType = req.doc.done
+						? "task_completed"
+						: "task_uncompleted";
+					await publishMessage({
+						event_type: eventType,
+						task_id: req.doc.id,
+					});
+				}
+
 				req.session.flash = {
 					type: "success",
 					text: "The task was updated successfully.",
@@ -189,6 +209,11 @@ export class TaskController {
 			await req.doc.deleteOne();
 
 			logger.silly("Deleted task document", { id: req.doc.id });
+
+			await publishMessage({
+				event_type: "task_deleted",
+				task_id: req.doc.id,
+			});
 
 			req.session.flash = {
 				type: "success",

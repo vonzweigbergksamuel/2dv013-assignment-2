@@ -21,6 +21,15 @@ services:
     volumes:
       - ./volumes/redis:/data
 
+  rabbit:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-admin}
+
   # Defines a service named 'just-task-it'.
   just-task-it:
     # Specifies that Docker should build the image using a Dockerfile file in the current directory.
@@ -34,6 +43,7 @@ services:
     # This means that Docker will start the 'mongodb' service before the 'just-task-it' service.
     depends_on:
       - mongodb
+      - rabbit
 
     # Specifies that Docker should restart the 'just-task-it' service if it fails.
     restart: on-failure
@@ -50,6 +60,9 @@ services:
 
       # The connection string for the MongoDB database. Defaults to 'mongodb://mongodb:27017/just-task-it' if not provided.
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-mongodb://mongodb:27017/just-task-it}
+
+      # The RabbitMQ connection URL. Defaults to 'amqp://admin:admin@rabbit:5672' if not provided.
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbit:5672}
 
       # The port that the Express application listens on. Defaults to 3000 if not provided.
       - PORT=${EXPRESS_APP_PORT:-3000}
