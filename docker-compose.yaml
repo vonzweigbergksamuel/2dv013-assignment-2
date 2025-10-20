@@ -9,10 +9,17 @@ services:
   # Defines a service named 'mongodb' that uses the mongo:8.0.0 image.
   mongodb:
     image: mongo:8.0.0
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
   # Defines a service named 'just-task-it'.
   just-task-it:
-      # Specifies that Docker should build the image using a Dockerfile file in the current directory.
+    # Specifies that Docker should build the image using a Dockerfile file in the current directory.
     build:
       context: .
 

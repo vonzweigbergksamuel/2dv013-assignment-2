@@ -1,13 +1,14 @@
-/**
- * @file This module contains the options object for the session middleware.
- * @module config/mongoose
- * @author Mats Loock
- * @version 1.0.0
- * @see {@link https://github.com/expressjs/session}
- */
+import { RedisStore } from "connect-redis";
+import { createClient } from "redis";
+
+const redisClient = createClient({
+	url: process.env.REDIS_URL || "redis://localhost:6379",
+});
+await redisClient.connect();
 
 // Options object for the session middleware.
 export const sessionOptions = {
+	store: new RedisStore({ client: redisClient }),
 	name: process.env.SESSION_NAME, // Don't use default session cookie name.
 	secret: process.env.SESSION_SECRET, // Change it!!! The secret is used to hash the session with HMAC.
 	resave: false, // Resave even if a request is not changing the session.
