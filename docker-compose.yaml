@@ -11,11 +11,15 @@ services:
     image: mongo:8.0.0
     ports:
       - "27017:27017"
+    volumes:
+      - ./volumes/mongodb:/data/db
 
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
+    volumes:
+      - ./volumes/redis:/data
 
   # Defines a service named 'just-task-it'.
   just-task-it:
