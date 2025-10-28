@@ -1,0 +1,59 @@
+name: Terraform Build
+
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Environment to deploy"
+                required: true
+                default: "stage"
+                type: choice
+                options:
+                    - stage
+                    - prod
+
+jobs:
+    terraform-build:
+        runs-on: ubuntu-latest
+        environment: ${{ github.event.inputs.environment }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Terraform
+              uses: hashicorp/setup-terraform@v3
+
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v2
+              with:
+                  credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+            - name: Set up ENV Variables
+              env:
+                  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+                  GCP_REGION: ${{ vars.GCP_REGION }}
+                  GCP_PROJECT_NAME: ${{ vars.GCP_PROJECT_NAME }}
+                  GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
+              run: |
+                  echo "TF_VAR_project_id=${GCP_PROJECT_ID}" >> $GITHUB_ENV
+                  echo "TF_VAR_region=${GCP_REGION}" >> $GITHUB_ENV
+                  echo "TF_VAR_project_name=${GCP_PROJECT_NAME}" >> $GITHUB_ENV
+
+            - name: Terraform init
+              run: |
+                  terraform init -backend-config="bucket=${GCP_BUCKET_NAME}" -backend-config="prefix=terraform/${{ github.event.inputs.environment }}"
+              working-directory: infra/terraform/${{ github.event.inputs.environment }}
+              env:
+                  GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
+
+            - name: Terraform plan
+              run: terraform plan -out=tfplan -var-file=env.tfvars
+              working-directory: infra/terraform/${{ github.event.inputs.environment }}
+
+            - name: Terraform apply
+              run: terraform apply -auto-approve tfplan
+              working-directory: infra/terraform/${{ github.event.inputs.environment }}
+
+            - name: Capture outputs
+              run: terraform output
+              working-directory: infra/terraform/${{ github.event.inputs.environment }}
