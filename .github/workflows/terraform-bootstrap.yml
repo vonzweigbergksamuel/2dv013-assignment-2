@@ -45,9 +45,9 @@ jobs:
           terraform output
         working-directory: infra/terraform/bootstrap
 
-      - name: Update GCP_BUCKET_NAME variable
+      - name: Update GCP_BUCKET_NAME secret
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
           BUCKET_NAME=$(terraform output -raw tfstate_bucket)
           gh secret set GCP_BUCKET_NAME --body "$BUCKET_NAME"
