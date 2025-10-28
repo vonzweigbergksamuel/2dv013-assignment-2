@@ -1,5 +1,5 @@
 resource "google_compute_network" "network" {
-  name                    = "${var.project_name}-${var.environment}-network"
+  name                    = "gke-${lower(var.project_name)}-${var.environment}-network"
   description             = "Network for the ${var.project_name} ${var.environment} cluster"
 
   auto_create_subnetworks = false
@@ -7,7 +7,7 @@ resource "google_compute_network" "network" {
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name = "${var.project_name}-${var.environment}-subnet"
+  name = "gke-${lower(var.project_name)}-${var.environment}-subnet"
 
   ip_cidr_range = var.subnet_cidr
   region        = var.region
