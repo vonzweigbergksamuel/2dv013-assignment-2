@@ -33,3 +33,15 @@ module "gke" {
   services_range_cidr = "192.168.0.0/24"
   pod_ranges_cidr = "192.168.1.0/24"
 }
+
+module "deploy" {
+  source = "../modules/deploy"
+
+  project_id   = var.project_id
+  region       = var.region
+  cluster_name = module.gke.cluster_name
+  namespace    = "prod"
+  
+  app_image    = "europe-west4-docker.pkg.dev/dv013-476513/docker-repo/just-task-it:latest"
+  app_replicas = 3
+}
