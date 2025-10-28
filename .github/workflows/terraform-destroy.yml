@@ -1,51 +1,49 @@
 name: Terraform Destroy
 
 on:
-    workflow_dispatch:
-        inputs:
-            environment:
-                description: "Environment to destroy"
-                required: true
-                default: "stage"
-                type: choice
-                options:
-                    - stage
-                    - prod
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to destroy"
+        required: true
+        default: "stage"
+        type: choice
+        options:
+          - stage
+          - prod
 
 jobs:
-    terraform-destroy:
-        runs-on: ubuntu-latest
-        environment: ${{ github.event.inputs.environment }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+  terraform-destroy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-            - name: Set up Terraform
-              uses: hashicorp/setup-terraform@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
-            - name: Authenticate to Google Cloud
-              uses: google-github-actions/auth@v2
-              with:
-                  credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-            - name: Set up ENV Variables
-              env:
-                  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-                  GCP_REGION: ${{ vars.GCP_REGION }}
-                  GCP_PROJECT_NAME: ${{ vars.GCP_PROJECT_NAME }}
-                  GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
-              run: |
-                  echo "TF_VAR_project_id=${GCP_PROJECT_ID}" >> $GITHUB_ENV
-                  echo "TF_VAR_region=${GCP_REGION}" >> $GITHUB_ENV
-                  echo "TF_VAR_project_name=${GCP_PROJECT_NAME}" >> $GITHUB_ENV
+      - name: Generate env.tfvars
+        run: |
+          cat > infra/terraform/${{ github.event.inputs.environment }}/env.tfvars <<EOF
+          project_id   = "${{ secrets.GCP_PROJECT_ID }}"
+          project_name = "${{ secrets.GCP_PROJECT_NAME }}"
+          region       = "${{ secrets.GCP_REGION }}"
+          devops_service_account_email = "${{ secrets.SERVICE_ACCOUNT_EMAIL }}"
+          EOF
 
-            - name: Terraform init
-              run: |
-                  terraform init -backend-config="bucket=${GCP_BUCKET_NAME}" -backend-config="prefix=terraform/${{ github.event.inputs.environment }}"
-              working-directory: infra/terraform/${{ github.event.inputs.environment }}
-              env:
-                  GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
+      - name: Terraform init
+        run: |
+          terraform init -backend-config="bucket=${GCP_BUCKET_NAME}" -backend-config="prefix=terraform/${{ github.event.inputs.environment }}"
+        working-directory: infra/terraform/${{ github.event.inputs.environment }}
+        env:
+          GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
 
-            - name: Terraform destroy
-              run: terraform destroy -auto-approve -var-file=env.tfvars
-              working-directory: infra/terraform/${{ github.event.inputs.environment }}
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve -var-file=env.tfvars
+        working-directory: infra/terraform/${{ github.event.inputs.environment }}
