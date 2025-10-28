@@ -73,3 +73,8 @@ variable "pvc_size" {
   type    = string
   default = "10Gi"
 }
+
+variable "load_balancer_type" {
+  type    = string
+  default = "EXTERNAL" # Change to "INTERNAL" if creating an internal loadbalancer
+}
