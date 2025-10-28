@@ -101,7 +101,7 @@ export class TaskController {
 
 			await publishMessage({
 				event_type: "task_created",
-				id: task.id,
+				task_id: task.id,
 			});
 
 			req.session.flash = {

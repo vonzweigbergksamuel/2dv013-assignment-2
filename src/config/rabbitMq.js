@@ -24,10 +24,14 @@ export const publishMessage = async (message) => {
 		event_type: message.event_type,
 		task_id: message.task_id,
 		timestamp: new Date().toISOString(),
+		count: 1,
 	};
 
 	await channel.sendToQueue(
 		process.env.RABBITMQ_QUEUE,
 		Buffer.from(JSON.stringify(messageObject)),
+		{
+			persistent: true,
+		},
 	);
 };
