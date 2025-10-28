@@ -42,7 +42,7 @@ jobs:
           terraform init -backend-config="bucket=${GCP_BUCKET_NAME}" -backend-config="prefix=terraform/${{ github.event.inputs.environment }}"
         working-directory: infra/terraform/${{ github.event.inputs.environment }}
         env:
-          GCP_BUCKET_NAME: ${{ vars.GCP_BUCKET_NAME }}
+          GCP_BUCKET_NAME: ${{ secrets.GCP_BUCKET_NAME }}
 
       - name: Terraform destroy
         run: terraform destroy -auto-approve -var-file=env.tfvars
