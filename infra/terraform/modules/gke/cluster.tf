@@ -1,5 +1,5 @@
 resource "google_container_cluster" "gke" {
-  name     = "${var.project_name}-${var.environment}-gke"
+  name     = "gke-${lower(var.project_name)}-${var.environment}"
   description = "GKE cluster for the ${var.project_name} ${var.environment} project"
 
   location = var.region
