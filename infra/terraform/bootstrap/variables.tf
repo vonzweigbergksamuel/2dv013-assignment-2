@@ -17,6 +17,7 @@ variable "apis" {
   description = "APIs to enable"
   type        = list(string)
   default = [
+    "cloudresourcemanager.googleapis.com",
     "container.googleapis.com",
     "compute.googleapis.com",
     "iam.googleapis.com",
