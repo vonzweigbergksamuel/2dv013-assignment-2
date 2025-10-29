@@ -25,15 +25,12 @@ resource "google_cloudbuild_trigger" "docker_build" {
   location   = var.region
   project    = var.project_id
   name       = "docker-build-trigger"
+  filename   = "cloudbuild.yaml"
 
-  repository_event_config {
-    repository = google_cloudbuildv2_repository.github.id
-    push {
-      branch = "^main$"
-    }
+  trigger_template {
+    branch_name = "main"
+    repo_name   = google_cloudbuildv2_repository.github.name
   }
-
-  filename = "cloudbuild.yaml"
 
   depends_on = [google_cloudbuildv2_repository.github]
 }
