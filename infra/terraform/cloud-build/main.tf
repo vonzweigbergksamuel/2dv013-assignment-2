@@ -14,15 +14,10 @@ data "google_project" "default" {
   project_id = var.project_id
 }
 
-data "google_cloudbuildv2_connection" "github" {
-  location = var.region
-  name     = "github"
-}
-
 resource "google_cloudbuildv2_repository" "github" {
   location          = var.region
   name              = "github-repo"
-  parent_connection = data.google_cloudbuildv2_connection.github.name
+  parent_connection = "projects/${var.project_id}/locations/${var.region}/connections/github"
   remote_uri        = "https://github.com/${var.github_repo}.git"
 }
 
