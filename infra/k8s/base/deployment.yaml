@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: just-task-it
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: just-task-it
+  template:
+    metadata:
+      labels:
+        app: just-task-it
+    spec:
+      containers:
+      - name: just-task-it
+        image: europe-west4-docker.pkg.dev/dv013-476513/docker-repo/just-task-it:latest
+        ports:
+        - containerPort: 3000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: app-config
+        env:
+        - name: PORT
+          value: "3000"
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: session-secret
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - NET_RAW
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault

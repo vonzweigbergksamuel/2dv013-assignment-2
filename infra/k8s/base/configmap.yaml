@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  DB_CONNECTION_STRING: "mongodb://mongodb:27017/just-task-it"
+  RABBITMQ_URL: "amqp://admin:admin@rabbitmq:5672"
+  BASE_URL: "/"
+  LOG_LEVEL: "info"
+  SESSION_NAME: "just-task-it.user-session"

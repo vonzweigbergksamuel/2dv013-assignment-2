@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: just-task-it-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: just-task-it
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http

@@ -44,7 +44,6 @@ jobs:
           echo "=== Bootstrap Complete ==="
           terraform output
         working-directory: infra/terraform/bootstrap
-
       - name: Update GCP_BUCKET_NAME secret
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
