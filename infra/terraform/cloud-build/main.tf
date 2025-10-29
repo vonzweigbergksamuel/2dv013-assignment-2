@@ -22,8 +22,9 @@ resource "google_cloudbuildv2_repository" "github" {
 }
 
 resource "google_cloudbuild_trigger" "docker_build" {
-  location = var.region
-  name     = "docker-build-trigger"
+  location   = var.region
+  project    = var.project_id
+  name       = "docker-build-trigger"
 
   repository_event_config {
     repository = google_cloudbuildv2_repository.github.id
