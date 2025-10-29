@@ -33,6 +33,8 @@ resource "google_cloudbuildv2_connection" "github" {
       oauth_token_secret_version = "${google_secret_manager_secret.github_oauth.id}/versions/latest"
     }
   }
+
+  depends_on = [google_secret_manager_secret_version.github_oauth_version]
 }
 
 resource "google_cloudbuildv2_repository" "github" {
