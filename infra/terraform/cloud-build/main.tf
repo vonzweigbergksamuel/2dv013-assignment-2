@@ -14,6 +14,12 @@ data "google_project" "default" {
   project_id = var.project_id
 }
 
+resource "google_secret_manager_secret_iam_member" "cloud_build_secret_access" {
+  secret_id = google_secret_manager_secret.github_token.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:service-${data.google_project.default.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+}
+
 resource "google_cloudbuildv2_connection" "github" {
   location = var.region
   name     = "github-connection"
