@@ -27,7 +27,7 @@ jobs:
           EOF
 
       - name: Create github-token.txt
-        run: echo "${{ secrets.WORKFLOW_TOKEN }}" > infra/terraform/cloud-build/github-token.txt
+        run: echo "${{ secrets.WORKFLOW_TOKEN }}" > github-token.txt
         working-directory: infra/terraform/cloud-build
 
       - name: Terraform init
