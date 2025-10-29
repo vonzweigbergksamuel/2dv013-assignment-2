@@ -14,30 +14,16 @@ data "google_project" "default" {
   project_id = var.project_id
 }
 
-resource "google_secret_manager_secret_iam_member" "cloud_build_secret_access" {
-  secret_id = google_secret_manager_secret.github_token.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:service-${data.google_project.default.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
-}
-
-resource "google_cloudbuildv2_connection" "github" {
+data "google_cloudbuildv2_connection" "github" {
   location = var.region
-  name     = "github-connection"
-
-  github_config {
-    authorizer_credential {
-      oauth_token_secret_version = google_secret_manager_secret_version.github_token_version.id
-    }
-  }
+  name     = "github"
 }
 
 resource "google_cloudbuildv2_repository" "github" {
-  location            = var.region
-  name                = "github-repo"
-  parent_connection   = google_cloudbuildv2_connection.github.name
-  remote_uri          = "https://github.com/${var.github_repo}.git"
-
-  depends_on = [google_cloudbuildv2_connection.github]
+  location          = var.region
+  name              = "github-repo"
+  parent_connection = data.google_cloudbuildv2_connection.github.name
+  remote_uri        = "https://github.com/${var.github_repo}.git"
 }
 
 resource "google_cloudbuild_trigger" "docker_build" {
@@ -54,11 +40,6 @@ resource "google_cloudbuild_trigger" "docker_build" {
   filename = "cloudbuild.yaml"
 
   depends_on = [google_cloudbuildv2_repository.github]
-}
-
-output "cloud_build_connection_id" {
-  value       = google_cloudbuildv2_connection.github.id
-  description = "GitHub connection ID"
 }
 
 output "cloud_build_trigger_id" {
