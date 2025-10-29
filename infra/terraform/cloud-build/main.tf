@@ -31,21 +31,13 @@ resource "google_cloudbuildv2_connection" "github" {
   }
 }
 
-data "google_cloudbuildv2_connection" "github" {
-  location       = var.region
-  name           = google_cloudbuildv2_connection.github.name
-  project        = var.project_id
-  
-  depends_on = [google_cloudbuildv2_connection.github]
-}
-
 resource "google_cloudbuildv2_repository" "github" {
   location            = var.region
   name                = "github-repo"
   parent_connection   = google_cloudbuildv2_connection.github.name
   remote_uri          = "https://github.com/${var.github_repo}.git"
 
-  depends_on = [data.google_cloudbuildv2_connection.github]
+  depends_on = [google_cloudbuildv2_connection.github]
 }
 
 resource "google_cloudbuild_trigger" "docker_build" {
