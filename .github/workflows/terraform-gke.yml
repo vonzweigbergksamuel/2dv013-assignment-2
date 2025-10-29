@@ -1,10 +1,10 @@
-name: Terraform Destroy GKE
+name: Terraform GKE
 
 on:
   workflow_dispatch:
 
 jobs:
-  destroy:
+  gke:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -30,6 +30,16 @@ jobs:
         run: terraform init -backend-config="bucket=${{ secrets.GCP_BUCKET_NAME }}" -backend-config="prefix=terraform/gke"
         working-directory: infra/terraform/gke
 
-      - name: Terraform destroy
-        run: terraform destroy -auto-approve -var-file=env.tfvars
+      - name: Terraform plan
+        run: terraform plan -out=tfplan -var-file=env.tfvars
+        working-directory: infra/terraform/gke
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: infra/terraform/gke
+
+      - name: Capture outputs
+        run: |
+          echo "=== GKE Cluster Setup Complete ==="
+          terraform output
         working-directory: infra/terraform/gke

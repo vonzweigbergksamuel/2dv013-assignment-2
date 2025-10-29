@@ -1,0 +1,45 @@
+name: Terraform Cloud Build
+
+on:
+    workflow_dispatch:
+
+jobs:
+    cloud-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Terraform
+              uses: hashicorp/setup-terraform@v3
+
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v2
+              with:
+                  credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+            - name: Generate env.tfvars
+              run: |
+                  cat > infra/terraform/cloud-build/env.tfvars <<EOF
+                  project_id   = "${{ secrets.GCP_PROJECT_ID }}"
+                  region       = "${{ secrets.GCP_REGION }}"
+                  github_repo  = "vonzweigbergksamuel/2dv013-assignment-2"
+                  EOF
+
+            - name: Terraform init
+              run: terraform init -backend-config="bucket=${{ secrets.GCP_BUCKET_NAME }}"
+              working-directory: infra/terraform/cloud-build
+
+            - name: Terraform plan
+              run: terraform plan -out=tfplan -var-file=env.tfvars
+              working-directory: infra/terraform/cloud-build
+
+            - name: Terraform apply
+              run: terraform apply -auto-approve tfplan
+              working-directory: infra/terraform/cloud-build
+
+            - name: Capture outputs
+              run: |
+                  echo "=== Cloud Build Setup Complete ==="
+                  terraform output
+              working-directory: infra/terraform/cloud-build
