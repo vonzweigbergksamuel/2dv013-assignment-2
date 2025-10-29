@@ -21,9 +21,11 @@ jobs:
       - name: Generate env.tfvars
         run: |
           cat > infra/terraform/cloud-build/env.tfvars <<EOF
-          project_id   = "${{ secrets.GCP_PROJECT_ID }}"
-          region       = "${{ secrets.GCP_REGION }}"
-          github_repo  = "vonzweigbergksamuel/2dv013-assignment-2"
+          project_id            = "${{ secrets.GCP_PROJECT_ID }}"
+          region                = "${{ secrets.GCP_REGION }}"
+          github_repo           = "vonzweigbergksamuel/2dv013-assignment-2"
+          app_installation_id   = 92131506
+          create_connection     = true
           EOF
 
       - name: Create github-token.txt
