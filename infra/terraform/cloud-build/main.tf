@@ -6,6 +6,11 @@ resource "google_secret_manager_secret" "github_oauth" {
   }
 }
 
+resource "google_secret_manager_secret_version" "github_oauth_version" {
+  secret      = google_secret_manager_secret.github_oauth.id
+  secret_data = file("${path.module}/github-token.txt")
+}
+
 data "google_project" "default" {
   project_id = var.project_id
 }
