@@ -72,7 +72,7 @@ services:
     container_name: grafana
     image: grafana/grafana
     ports:
-      - "3002:3000"
+      - "3000:3000"
     environment:
       - INFLUXD_ORG=${INFLUXD_ORG:-jti-org}
       - INFLUXD_BUCKET=${INFLUXD_BUCKET:-jti-bucket}
@@ -131,7 +131,7 @@ services:
 
       - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbit:5672}
 
-      - PORT=${EXPRESS_APP_PORT:-3000}
+      - PORT=${EXPRESS_APP_PORT:-3002}
 
       - SESSION_NAME=${SESSION_NAME:-just-task-it-feat-logging.user-session}
 
@@ -145,7 +145,7 @@ services:
       - LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE=${LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE:-/usr/src/app/logs/uncaught-exception.log}
 
     ports:
-      - "${DOCKER_HOST_PORT:-3000}:${EXPRESS_APP_PORT:-3000}"
+      - "${DOCKER_HOST_PORT:-3002}:${EXPRESS_APP_PORT:-3002}"
 
 volumes:
   logs:
