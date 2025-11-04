@@ -1,18 +1,15 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+kind: Service
 metadata:
-  name: just-task-it
-  annotations:
-    kubernetes.io/ingress.class: "gce"
-    networking.gke.io/managed-certificates: ""
+  name: just-task-it-loadbalancer
+  labels:
+    app: just-task-it
 spec:
-  rules:
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: just-task-it-service
-                port:
-                  number: 80
+  type: LoadBalancer
+  selector:
+    io.kompose.service: just-task-it
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3002
+    protocol: TCP

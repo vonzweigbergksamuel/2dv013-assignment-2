@@ -1,70 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: just-task-it
+  name: web
   labels:
-    app: just-task-it
+    app: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: just-task-it
+      app: web
   template:
     metadata:
       labels:
-        app: just-task-it
+        app: web
     spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        seccompProfile:
-          type: RuntimeDefault
       containers:
-        - name: just-task-it
-          image: europe-west4-docker.pkg.dev/dv013-476513/docker-repo/just-task-it:latest
-          imagePullPolicy: Always
+        - name: web
+          image: nginx:stable
           ports:
-            - containerPort: 3000
-              name: http
-          envFrom:
-            - configMapRef:
-                name: app-config
-          env:
-            - name: PORT
-              value: "3000"
-            - name: SESSION_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: session-secret
+            - containerPort: 80
           resources:
             requests:
-              cpu: 50m
-              memory: 192Mi
+              cpu: '100m'
+              memory: '128Mi'
             limits:
-              cpu: 250m
-              memory: 384Mi
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            capabilities:
-              drop:
-                - NET_RAW
-          volumeMounts:
-            - name: app-logs
-              mountPath: /usr/src/app/logs
-      volumes:
-        - name: app-logs
-          emptyDir: {}
+              cpu: '500m'
+              memory: '256Mi'

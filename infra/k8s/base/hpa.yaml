@@ -2,6 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: just-task-it
+  namespace: just-task-it
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

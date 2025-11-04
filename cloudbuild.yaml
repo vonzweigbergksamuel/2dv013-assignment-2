@@ -37,11 +37,11 @@ steps:
         
         # Deploy to GKE
         gcloud container clusters get-credentials gke-2dv013-prod --zone=$_ZONE
+        kubectl delete pod/just-task-it -n $_NAMESPACE --ignore-not-found || true
         kubectl apply -f infra/k8s/base/namespace.yaml
         if ls infra/k8s/generated/*.yaml >/dev/null 2>&1; then
           kubectl apply -n $_NAMESPACE -f infra/k8s/generated
         fi
-        kubectl kustomize infra/k8s/overlays/prod/ | kubectl apply -f -
         kubectl create secret generic app-secrets \
           --from-literal=session-secret="$$SESSION_SECRET" \
           --dry-run=client -o yaml | kubectl apply -f - -n $_NAMESPACE
