@@ -20,21 +20,6 @@ steps:
       - push
       - $_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:latest
 
-  - name: gcr.io/cloud-builders/kubectl
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        kubectl create secret generic app-secrets \
-          --from-literal=session-secret=$$SESSION_SECRET \
-          --dry-run=client -o yaml | \
-        kubectl apply -f - -n production
-    env:
-      - CLOUDSDK_COMPUTE_REGION=$_REGION
-      - CLOUDSDK_CONTAINER_CLUSTER=gke-2dv013-prod
-    secretEnv:
-      - SESSION_SECRET
-
   - name: gcr.io/cloud-builders/gke-deploy
     args:
       - run
@@ -45,6 +30,21 @@ steps:
     env:
       - CLOUDSDK_COMPUTE_REGION=$_REGION
       - CLOUDSDK_CONTAINER_CLUSTER=gke-2dv013-prod
+
+  - name: gcr.io/cloud-builders/kubectl
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud container clusters get-credentials gke-2dv013-prod --region=$_REGION
+        kubectl create secret generic app-secrets \
+          --from-literal=session-secret=$$SESSION_SECRET \
+          --dry-run=client -o yaml | \
+        kubectl apply -f - -n production
+    env:
+      - CLOUDSDK_COMPUTE_REGION=$_REGION
+    secretEnv:
+      - SESSION_SECRET
 
 images:
   - $_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA
