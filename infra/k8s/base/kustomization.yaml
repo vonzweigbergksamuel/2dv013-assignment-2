@@ -12,6 +12,4 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - service.yaml
-  - mongodb.yaml
-  - redis.yaml
-  - rabbitmq.yaml
+  - generated-services.yaml

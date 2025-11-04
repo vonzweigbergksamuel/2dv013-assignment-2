@@ -201,4 +201,5 @@ $RECYCLE.BIN/
 /logs
 /volumes
 
-/terraform-google-cloud-build-gen-2
+/terraform-google-cloud-build-gen-2local/
+infra/k8s/base/generated-services.yaml
