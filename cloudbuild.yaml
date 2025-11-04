@@ -35,7 +35,7 @@ steps:
         
         # Deploy to GKE
         gcloud container clusters get-credentials gke-2dv013-prod --region=$_REGION
-        kubectl apply -k infra/k8s/overlays/prod/
+        kubectl kustomize infra/k8s/overlays/prod/ | kubectl apply -n $_NAMESPACE -f -
         kubectl create secret generic app-secrets \
           --from-literal=session-secret="$$SESSION_SECRET" \
           --dry-run=client -o yaml | kubectl apply -f - -n $_NAMESPACE

@@ -29,6 +29,8 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: session-secret
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"
         resources:
           requests:
             cpu: 100m
