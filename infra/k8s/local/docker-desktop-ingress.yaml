@@ -12,8 +12,9 @@ spec:
     io.kompose.service: just-task-it
   ports:
   - port: 80
-    targetPort: 3000
+    targetPort: 3002
     nodePort: 30080  # Access via localhost:30080
+
 ---
 # Alternative: LoadBalancer for Docker Desktop
 apiVersion: v1
@@ -29,7 +30,7 @@ spec:
     io.kompose.service: just-task-it
   ports:
   - port: 80
-    targetPort: 3000
+    targetPort: 3002
 
 ---
 # Docker Desktop Kubernetes - Simple NodePort Service
@@ -46,5 +47,5 @@ spec:
     io.kompose.service: grafana
   ports:
   - port: 80
-    targetPort: 3002
+    targetPort: 3000
     nodePort: 30081  # Access via localhost:30081
