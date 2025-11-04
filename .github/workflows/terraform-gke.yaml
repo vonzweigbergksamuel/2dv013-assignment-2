@@ -21,9 +21,16 @@ jobs:
       - name: Generate env.tfvars
         run: |
           cat > infra/terraform/gke/env.tfvars <<EOF
-          project_id   = "${{ secrets.GCP_PROJECT_ID }}"
-          project_name = "${{ secrets.GCP_PROJECT_NAME }}"
-          region       = "${{ secrets.GCP_REGION }}"
+          project_id           = "${{ secrets.GCP_PROJECT_ID }}"
+          project_name         = "${{ secrets.GCP_PROJECT_NAME }}"
+          region               = "${{ secrets.GCP_REGION }}"
+          ipv6_access_type     = "${{ secrets.GKE_IPV6_ACCESS_TYPE }}"
+          stack_type           = "${{ secrets.GKE_STACK_TYPE }}"
+          delete_protection    = ${{ secrets.GKE_DELETE_PROTECTION }}
+          subnet_cidr          = "${{ secrets.GKE_SUBNET_CIDR }}"
+          services_range_cidr  = "${{ secrets.GKE_SERVICES_RANGE_CIDR }}"
+          pod_ranges_cidr      = "${{ secrets.GKE_POD_RANGES_CIDR }}"
+          environment          = "${{ secrets.GKE_ENVIRONMENT }}"
           EOF
 
       - name: Terraform init
