@@ -31,7 +31,7 @@ steps:
         
         # Generate Kubernetes manifests from docker-compose
         mkdir -p infra/k8s/base
-        kompose convert -f docker-compose.yaml -f docker-compose.production.yaml -o infra/k8s/base/komposed.yaml
+        kompose convert -f docker-compose.yaml -f docker-compose.production.yaml -o infra/k8s/base/generated-services.yaml
         
         # Deploy to GKE
         gcloud container clusters get-credentials gke-2dv013-prod --region=$_REGION
