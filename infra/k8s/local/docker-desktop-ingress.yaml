@@ -1,0 +1,50 @@
+# Docker Desktop Kubernetes - Simple NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: just-task-it-nodeport
+  namespace: just-task-it
+  labels:
+    app: just-task-it
+spec:
+  type: NodePort
+  selector:
+    io.kompose.service: just-task-it
+  ports:
+  - port: 80
+    targetPort: 3000
+    nodePort: 30080  # Access via localhost:30080
+---
+# Alternative: LoadBalancer for Docker Desktop
+apiVersion: v1
+kind: Service
+metadata:
+  name: just-task-it-loadbalancer
+  namespace: just-task-it
+  labels:
+    app: just-task-it
+spec:
+  type: LoadBalancer
+  selector:
+    io.kompose.service: just-task-it
+  ports:
+  - port: 80
+    targetPort: 3000
+
+---
+# Docker Desktop Kubernetes - Simple NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-nodeport
+  namespace: just-task-it
+  labels:
+    app: grafana
+spec:
+  type: NodePort
+  selector:
+    io.kompose.service: grafana
+  ports:
+  - port: 80
+    targetPort: 3002
+    nodePort: 30081  # Access via localhost:30081

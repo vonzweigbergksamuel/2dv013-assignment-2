@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: just-task-it
+  labels:
+    app: just-task-it
 spec:
   replicas: 1
   selector:
@@ -12,55 +14,57 @@ spec:
       labels:
         app: just-task-it
     spec:
-      containers:
-      - name: just-task-it
-        image: europe-west4-docker.pkg.dev/dv013-476513/docker-repo/just-task-it:latest
-        ports:
-        - containerPort: 3000
-          name: http
-        envFrom:
-        - configMapRef:
-            name: app-config
-        env:
-        - name: PORT
-          value: "3000"
-        - name: REDIS_URL
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: REDIS_URL
-        - name: SESSION_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: session-secret
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-            - NET_RAW
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
         seccompProfile:
           type: RuntimeDefault
+      containers:
+        - name: just-task-it
+          image: europe-west4-docker.pkg.dev/dv013-476513/docker-repo/just-task-it:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: app-config
+          env:
+            - name: PORT
+              value: "3000"
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: session-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - NET_RAW
+          volumeMounts:
+            - name: app-logs
+              mountPath: /usr/src/app/logs
+      volumes:
+        - name: app-logs
+          emptyDir: {}

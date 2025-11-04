@@ -203,3 +203,4 @@ $RECYCLE.BIN/
 
 /terraform-google-cloud-build-gen-2local/
 infra/k8s/base/generated-services.yaml
+infra/k8s/local/kompose

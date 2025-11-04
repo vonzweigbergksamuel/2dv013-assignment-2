@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: just-task-it-ingress
+  namespace: just-task-it
+  annotations:
+    # For k3s with Traefik (default)
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    # Optional: Add SSL redirect
+    # traefik.ingress.kubernetes.io/redirect-entry-point: https
+spec:
+  rules:
+  - host: just-task-it.local  # Change this to your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: just-task-it-service
+            port:
+              number: 3002
+---
+# Alternative: NodePort for direct access (useful for testing)
+apiVersion: v1
+kind: Service
+metadata:
+  name: just-task-it-nodeport
+  namespace: just-task-it
+  labels:
+    app: just-task-it
+spec:
+  type: NodePort
+  selector:
+    io.kompose.service: just-task-it
+  ports:
+  - port: 80
+    targetPort: 3002
+    nodePort: 30080  # Access via <node-ip>:30080

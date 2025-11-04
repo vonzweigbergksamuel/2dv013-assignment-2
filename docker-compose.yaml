@@ -1,5 +1,6 @@
 services:
   mongodb:
+    container_name: mongodb
     image: mongo:8.0.0
     ports:
       - "27017:27017"
@@ -7,6 +8,7 @@ services:
       - mongo_storage:/volumes/mongodb:/data/db
 
   redis:
+    container_name: redis
     image: redis:latest
     ports:
       - "6379:6379"
@@ -14,6 +16,7 @@ services:
       - redis_storage:/volumes/redis:/data
 
   rabbit:
+    container_name: rabbit
     image: rabbitmq:4-management
     ports:
       - "5672:5672"
@@ -23,8 +26,8 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-admin}
 
   influxdb:
-    image: influxdb:latest
     container_name: influxdb
+    image: influxdb:latest
     ports:
       - "8086:8086"
     volumes:
@@ -44,12 +47,15 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-token
 
   telegraf:
-    image: telegraf:latest
     container_name: telegraf
+    image: telegraf:latest
+    user: "999:999"
+    entrypoint: ["/usr/bin/telegraf"]
+    command: ["--config", "/etc/telegraf/telegraf.conf"]
     depends_on:
       - influxdb
       - rabbit
-      # Need to wait for the JTI application to start
+      - just-task-it
     restart: on-failure
     environment:
       - RABBITMQ_USER=${RABBITMQ_USER:-admin}
@@ -63,10 +69,10 @@ services:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
   grafana:
-    image: grafana/grafana
     container_name: grafana
+    image: grafana/grafana
     ports:
-      - "3000:3000"
+      - "3002:3000"
     environment:
       - INFLUXD_ORG=${INFLUXD_ORG:-jti-org}
       - INFLUXD_BUCKET=${INFLUXD_BUCKET:-jti-bucket}
@@ -77,18 +83,44 @@ services:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER:-admin}
     volumes:
       - grafana_storage:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboard:/etc/grafana/dashboards
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/dashboard:/etc/grafana/dashboards:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
 
   just-task-it:
+    container_name: just-task-it
     build:
       context: .
 
+    volumes:
+      - logs:/usr/src/app/logs
+
     image: 2dv013/just-task-it:1.0.0
 
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+
     depends_on:
-      - mongodb
-      - rabbit
+      mongodb:
+        condition: service_started
+      rabbit:
+        condition: service_started
+      redis:
+        condition: service_started
 
     restart: on-failure
 
@@ -108,17 +140,15 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
 
       - LOGGER_MORGAN_FORMAT_ADD_REMOTE=${LOGGER_MORGAN_FORMAT_ADD_REMOTE:-true}
-
-      - LOGGER_COMBINED_LOG_FILE=${LOGGER_COMBINED_LOG_FILE:-/var/log/just-task-it/combined.log}
-
-      - LOGGER_ERROR_LOG_FILE=${LOGGER_ERROR_LOG_FILE:-/var/log/just-task-it/error.log}
-
-      - LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE=${LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE:-/var/log/just-task-it/uncaught-exception.log}
+      - LOGGER_COMBINED_LOG_FILE=${LOGGER_COMBINED_LOG_FILE:-/usr/src/app/logs/combined.log}
+      - LOGGER_ERROR_LOG_FILE=${LOGGER_ERROR_LOG_FILE:-/usr/src/app/logs/error.log}
+      - LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE=${LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE:-/usr/src/app/logs/uncaught-exception.log}
 
     ports:
-      - "${DOCKER_HOST_PORT}:${EXPRESS_APP_PORT:-3000}"
+      - "${DOCKER_HOST_PORT:-3000}:${EXPRESS_APP_PORT:-3000}"
 
 volumes:
+  logs:
   influxdb_data:
   grafana_storage:
   mongo_storage:

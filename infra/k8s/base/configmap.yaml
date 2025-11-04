@@ -5,7 +5,7 @@ metadata:
 data:
   DB_CONNECTION_STRING: "mongodb://mongodb:27017/just-task-it"
   RABBITMQ_URL: "amqp://admin:admin@rabbit:5672"
+  REDIS_URL: "redis://redis:6379"
   BASE_URL: "/"
   LOG_LEVEL: "info"
   SESSION_NAME: "just-task-it.user-session"
-  REDIS_URL: "redis://redis:6379"

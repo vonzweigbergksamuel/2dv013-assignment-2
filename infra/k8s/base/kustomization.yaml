@@ -1,15 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: production
-
-commonLabels:
-  app.kubernetes.io/part-of: just-task-it
-  app.kubernetes.io/version: "1.0"
+namespace: just-task-it
 
 resources:
   - namespace.yaml
   - configmap.yaml
   - deployment.yaml
   - service.yaml
-  - generated-services.yaml
+  - ingress.yaml
+  - hpa.yaml
