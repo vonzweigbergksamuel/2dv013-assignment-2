@@ -3,7 +3,7 @@ resource "google_compute_network" "network" {
   description             = "Network for the ${var.project_name} ${var.environment} cluster"
 
   auto_create_subnetworks = false
-  enable_ula_internal_ipv6 = true
+  enable_ula_internal_ipv6 = var.stack_type == "IPV4_IPV6"
 }
 
 resource "google_compute_subnetwork" "subnet" {
@@ -13,7 +13,7 @@ resource "google_compute_subnetwork" "subnet" {
   region        = var.region
 
   stack_type       = var.stack_type
-  ipv6_access_type = var.ipv6_access_type
+  ipv6_access_type = var.stack_type == "IPV4_IPV6" ? var.ipv6_access_type : null
 
   network = google_compute_network.network.id
   secondary_ip_range {

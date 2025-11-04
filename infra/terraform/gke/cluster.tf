@@ -15,6 +15,7 @@ resource "google_container_cluster" "gke" {
     services_secondary_range_name = google_compute_subnetwork.subnet.secondary_ip_range[0].range_name
     cluster_secondary_range_name  = google_compute_subnetwork.subnet.secondary_ip_range[1].range_name
   }
+  datapath_provider = var.stack_type == "IPV4_IPV6" ? "ADVANCED_DATAPATH" : "LEGACY_DATAPATH"
 
   # Set `deletion_protection` to `true` will ensure that one cannot
   # accidentally delete this instance by use of Terraform.
