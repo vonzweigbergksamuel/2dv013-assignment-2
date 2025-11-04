@@ -36,7 +36,7 @@ steps:
         find infra/k8s/generated -name "*just-task-it*" -delete
         
         # Deploy to GKE
-        gcloud container clusters get-credentials gke-2dv013-prod --region=$_REGION
+        gcloud container clusters get-credentials gke-2dv013-prod --zone=$_ZONE
         kubectl apply -f infra/k8s/base/namespace.yaml
         if ls infra/k8s/generated/*.yaml >/dev/null 2>&1; then
           kubectl apply -n $_NAMESPACE -f infra/k8s/generated
@@ -88,6 +88,7 @@ images:
 substitutions:
   _REGION: europe-west4
   _NAMESPACE: production
+  _ZONE: europe-west4-a
 
 options:
   machineType: E2_HIGHCPU_8
