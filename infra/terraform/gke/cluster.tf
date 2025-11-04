@@ -2,7 +2,7 @@ resource "google_container_cluster" "gke" {
   name     = "gke-${lower(var.project_name)}-${var.environment}"
   description = "GKE cluster for the ${var.project_name} ${var.environment} project"
 
-  location = var.region
+  location = var.zone
   remove_default_node_pool = true
   initial_node_count       = 1
   enable_l4_ilb_subsetting = true
@@ -37,7 +37,7 @@ resource "google_container_cluster" "gke" {
 
 resource "google_container_node_pool" "default_pool" {
   name     = "${lower(var.project_name)}-${var.environment}-pool"
-  location = var.region
+  location = var.zone
   cluster  = google_container_cluster.gke.name
 
   initial_node_count = 1
