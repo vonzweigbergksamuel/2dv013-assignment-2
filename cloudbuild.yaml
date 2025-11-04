@@ -37,7 +37,7 @@ steps:
         gcloud container clusters get-credentials gke-2dv013-prod --region=$_REGION
         kubectl apply -k infra/k8s/overlays/prod/
         kubectl create secret generic app-secrets \
-          --from-literal=session-secret="$SESSION_SECRET" \
+          --from-literal=session-secret="$$SESSION_SECRET" \
           --dry-run=client -o yaml | kubectl apply -f - -n $NAMESPACE
         kubectl set image deployment/just-task-it \
           just-task-it=$_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA \
@@ -89,4 +89,4 @@ options:
 availableSecrets:
   secretManager:
     - env: SESSION_SECRET
-      versionName: projects/556283934605/secrets/SESSION_SECRET/versions/latest
+      versionName: projects/$PROJECT_ID/secrets/SESSION_SECRET/versions/latest
