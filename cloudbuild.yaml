@@ -88,5 +88,5 @@ options:
 
 availableSecrets:
   secretManager:
-    - versionName: projects/556283934605/secrets/SESSION_SECRET/versions/latest
-      env: SESSION_SECRET
+    - env: SESSION_SECRET
+      versionName: projects/556283934605/secrets/SESSION_SECRET/versions/latest
