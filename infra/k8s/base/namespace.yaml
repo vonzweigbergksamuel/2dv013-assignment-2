@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: just-task-it
+  name: production
   labels:
-    name: just-task-it
-    app: just-task-it
+    name: production
+    app: production
