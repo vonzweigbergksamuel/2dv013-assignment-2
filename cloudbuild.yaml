@@ -38,40 +38,40 @@ steps:
         kubectl apply -k infra/k8s/overlays/prod/
         kubectl create secret generic app-secrets \
           --from-literal=session-secret="$$SESSION_SECRET" \
-          --dry-run=client -o yaml | kubectl apply -f - -n $NAMESPACE
+          --dry-run=client -o yaml | kubectl apply -f - -n $_NAMESPACE
         kubectl set image deployment/just-task-it \
           just-task-it=$_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA \
-          -n $NAMESPACE
+          -n $_NAMESPACE
         
         # Wait for deployment to stabilize
         sleep 10
         
         # Verify deployment
         echo "=== POD STATUS ==="
-        kubectl -n $NAMESPACE get pods -o wide || true
+        kubectl -n $_NAMESPACE get pods -o wide || true
         
         echo ""
         echo "=== EVENTS ==="
-        kubectl -n $NAMESPACE get events --sort-by=.lastTimestamp | tail -n 30 || true
+        kubectl -n $_NAMESPACE get events --sort-by=.lastTimestamp | tail -n 30 || true
         
         echo ""
         echo "=== DEPLOYMENT STATUS ==="
-        kubectl -n $NAMESPACE get deployment just-task-it -o wide || true
+        kubectl -n $_NAMESPACE get deployment just-task-it -o wide || true
         
         echo ""
         echo "=== APP POD LOGS ==="
-        kubectl -n $NAMESPACE logs deployment/just-task-it --tail=50 --all-containers || true
+        kubectl -n $_NAMESPACE logs deployment/just-task-it --tail=50 --all-containers || true
         
         echo ""
         echo "=== SERVICES ==="
-        kubectl -n $NAMESPACE get svc -o wide || true
+        kubectl -n $_NAMESPACE get svc -o wide || true
         
         echo ""
         echo "=== DEPLOYMENT COMPLETE ==="
     env:
       - CLOUDSDK_COMPUTE_REGION=$_REGION
       - CLOUDSDK_CONTAINER_CLUSTER=gke-2dv013-prod
-      - NAMESPACE=production
+      - NAMESPACE=$_NAMESPACE
     secretEnv:
       - SESSION_SECRET
 
@@ -81,6 +81,7 @@ images:
 
 substitutions:
   _REGION: europe-west4
+  _NAMESPACE: production
 
 options:
   machineType: E2_HIGHCPU_8
