@@ -12,4 +12,4 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - service.yaml
-  - generated-services.yaml
+  - komposed.yaml
