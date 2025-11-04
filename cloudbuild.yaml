@@ -87,7 +87,6 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 availableSecrets:
-  - k8sSecret:
-      name: app-secrets
-      secretEnv:
-        - SESSION_SECRET
+  secretManager:
+    - env: SESSION_SECRET
+      versionName: projects/556283934605/secrets/SESSION_SECRET/versions/latest
