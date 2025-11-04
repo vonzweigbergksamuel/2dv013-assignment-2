@@ -24,13 +24,16 @@ spec:
         env:
         - name: PORT
           value: "3000"
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: REDIS_URL
         - name: SESSION_SECRET
           valueFrom:
             secretKeyRef:
               name: app-secrets
               key: session-secret
-        - name: REDIS_URL
-          value: "redis://redis-service:6379"
         resources:
           requests:
             cpu: 100m

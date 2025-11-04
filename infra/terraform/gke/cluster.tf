@@ -54,7 +54,7 @@ resource "google_container_node_pool" "default_pool" {
 
   node_config {
     machine_type = "e2-small"
-    disk_size_gb = 30
+    disk_size_gb = 20
     disk_type    = "pd-balanced"
 
     oauth_scopes = [
