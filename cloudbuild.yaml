@@ -33,21 +33,25 @@ steps:
         rm -rf infra/k8s/generated
         mkdir -p infra/k8s/generated
         kompose convert -f docker-compose.yaml --namespace $_NAMESPACE -o infra/k8s/generated
-        find infra/k8s/generated -name "*just-task-it*" -delete
+        
+        # Update just-task-it image in generated manifest
+        if [ -f infra/k8s/generated/just-task-it-pod.yaml ]; then
+          sed -i "s|image:.*|image: $_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA|g" infra/k8s/generated/just-task-it-pod.yaml
+          sed -i "s|value: secret|value: \"$$SESSION_SECRET\"|g" infra/k8s/generated/just-task-it-pod.yaml
+        fi
+        
+        # Fix Grafana permissions
+        if [ -f infra/k8s/generated/grafana-deployment.yaml ]; then
+          sed -i '/^      containers:/i\      securityContext:\n        fsGroup: 472' infra/k8s/generated/grafana-deployment.yaml
+        fi
         
         # Deploy to GKE
         gcloud container clusters get-credentials gke-2dv013-prod --zone=$_ZONE
-        kubectl delete pod/just-task-it -n $_NAMESPACE --ignore-not-found || true
         kubectl apply -f infra/k8s/base/namespace.yaml
+        kubectl delete pod/just-task-it -n $_NAMESPACE --ignore-not-found || true
         if ls infra/k8s/generated/*.yaml >/dev/null 2>&1; then
           kubectl apply -n $_NAMESPACE -f infra/k8s/generated
         fi
-        kubectl create secret generic app-secrets \
-          --from-literal=session-secret="$$SESSION_SECRET" \
-          --dry-run=client -o yaml | kubectl apply -f - -n $_NAMESPACE
-        kubectl set image deployment/just-task-it \
-          just-task-it=$_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA \
-          -n $_NAMESPACE
         
         # Wait for deployment to stabilize
         sleep 10
@@ -61,12 +65,12 @@ steps:
         kubectl -n $_NAMESPACE get events --sort-by=.lastTimestamp | tail -n 30 || true
         
         echo ""
-        echo "=== DEPLOYMENT STATUS ==="
-        kubectl -n $_NAMESPACE get deployment just-task-it -o wide || true
+        echo "=== POD STATUS (just-task-it) ==="
+        kubectl -n $_NAMESPACE get pod just-task-it -o wide || true
         
         echo ""
         echo "=== APP POD LOGS ==="
-        kubectl -n $_NAMESPACE logs deployment/just-task-it --tail=50 --all-containers || true
+        kubectl -n $_NAMESPACE logs pod/just-task-it --tail=50 --all-containers || true
         
         echo ""
         echo "=== SERVICES ==="
