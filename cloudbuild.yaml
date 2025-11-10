@@ -41,6 +41,8 @@ steps:
             sed -i "s|image: just-task-it:latest|image: $_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA|g" "$$manifest"
             sed -i "s|value: secret|value: \"$$SESSION_SECRET\"|g" "$$manifest"
             sed -i '/kompose.image-pull-policy/d' "$$manifest"
+            echo "Environment variables in manifest:"
+            grep -A 2 "RABBITMQ" "$$manifest" || echo "WARNING: RABBITMQ env vars not found!"
             break
           fi
         done
@@ -70,12 +72,12 @@ steps:
         kubectl -n $_NAMESPACE get events --sort-by=.lastTimestamp | tail -n 30 || true
         
         echo ""
-        echo "=== POD STATUS (just-task-it) ==="
-        kubectl -n $_NAMESPACE get pod just-task-it -o wide || true
+        echo "=== DEPLOYMENT STATUS (just-task-it) ==="
+        kubectl -n $_NAMESPACE get deployment just-task-it -o wide || true
         
         echo ""
         echo "=== APP POD LOGS ==="
-        kubectl -n $_NAMESPACE logs pod/just-task-it --tail=50 --all-containers || true
+        kubectl -n $_NAMESPACE logs deployment/just-task-it --tail=50 --all-containers || true
         
         echo ""
         echo "=== SERVICES ==="
