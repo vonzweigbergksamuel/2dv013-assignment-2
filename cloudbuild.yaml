@@ -35,16 +35,15 @@ steps:
         kompose convert -f docker-compose.yaml --namespace $_NAMESPACE -o infra/k8s/generated
         
         # Update just-task-it image in generated manifest
-        JTI_MANIFEST=$(ls infra/k8s/generated/just-task-it-*.yaml 2>/dev/null | grep -E "(pod|deployment)" | head -1)
-        if [ -n "$JTI_MANIFEST" ]; then
-          echo "Updating manifest: $JTI_MANIFEST"
-          sed -i "s|image: just-task-it:latest|image: $_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA|g" "$JTI_MANIFEST"
-          sed -i "s|value: secret|value: \"$$SESSION_SECRET\"|g" "$JTI_MANIFEST"
-          sed -i '/kompose.image-pull-policy/d' "$JTI_MANIFEST"
-        else
-          echo "WARNING: No just-task-it manifest found!"
-          ls -la infra/k8s/generated/ || true
-        fi
+        for manifest in infra/k8s/generated/just-task-it-*.yaml; do
+          if [ -f "$$manifest" ]; then
+            echo "Updating manifest: $$manifest"
+            sed -i "s|image: just-task-it:latest|image: $_REGION-docker.pkg.dev/$PROJECT_ID/docker-repo/just-task-it:$SHORT_SHA|g" "$$manifest"
+            sed -i "s|value: secret|value: \"$$SESSION_SECRET\"|g" "$$manifest"
+            sed -i '/kompose.image-pull-policy/d' "$$manifest"
+            break
+          fi
+        done
         
         # Fix Grafana permissions
         if [ -f infra/k8s/generated/grafana-deployment.yaml ]; then
