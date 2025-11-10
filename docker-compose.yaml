@@ -126,6 +126,8 @@ services:
 
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-mongodb://mongodb:27017/just-task-it}
 
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+
       - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbit:5672}
       - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-task-events}
 
