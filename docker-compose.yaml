@@ -127,6 +127,7 @@ services:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-mongodb://mongodb:27017/just-task-it}
 
       - RABBITMQ_URL=${RABBITMQ_URL:-amqp://admin:admin@rabbit:5672}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-task-events}
 
       - PORT=${EXPRESS_APP_PORT:-3002}
 
