@@ -60,6 +60,11 @@ steps:
           kubectl apply -n $_NAMESPACE -f infra/k8s/generated
         fi
         
+        # Apply base manifests (LoadBalancers, Ingress, HPA)
+        kubectl apply -n $_NAMESPACE -f infra/k8s/base/ingress.yaml || true
+        kubectl apply -n $_NAMESPACE -f infra/k8s/base/grafana-ingress.yaml || true
+        kubectl apply -n $_NAMESPACE -f infra/k8s/base/hpa.yaml || true
+        
         # Wait for deployment to stabilize
         sleep 10
         
