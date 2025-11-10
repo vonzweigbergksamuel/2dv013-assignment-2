@@ -100,10 +100,20 @@ services:
     build:
       context: .
 
-    volumes:
-      - logs:/usr/src/app/logs
+    image: just-task-it:latest
 
-    image: 2dv013/just-task-it:1.0.0
+    labels:
+      kompose.image-pull-policy: "Never"
+
+    depends_on:
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
+
+    restart: always
 
     deploy:
       resources:
@@ -113,16 +123,6 @@ services:
         reservations:
           cpus: "0.2"
           memory: 256M
-
-    depends_on:
-      mongodb:
-        condition: service_started
-      rabbit:
-        condition: service_started
-      redis:
-        condition: service_started
-
-    restart: on-failure
 
     environment:
       - BASE_URL=${BASE_URL:-/}
