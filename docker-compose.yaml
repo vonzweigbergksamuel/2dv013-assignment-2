@@ -102,9 +102,6 @@ services:
 
     image: just-task-it:latest
 
-    labels:
-      kompose.image-pull-policy: "Never"
-
     depends_on:
       mongodb:
         condition: service_started
