@@ -89,11 +89,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.2"
+          cpus: "0.5"
           memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
 
   just-task-it:
     container_name: just-task-it
@@ -118,11 +118,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.2"
+          cpus: "0.5"
           memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
 
     environment:
       - BASE_URL=${BASE_URL:-/}
