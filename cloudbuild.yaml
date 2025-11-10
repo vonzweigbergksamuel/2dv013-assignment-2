@@ -87,7 +87,7 @@ images:
 
 substitutions:
   _REGION: europe-west4
-  _NAMESPACE: production
+  _NAMESPACE: just-task-it
   _ZONE: europe-west4-a
 
 options:
