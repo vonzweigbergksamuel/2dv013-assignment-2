@@ -19,6 +19,6 @@ export const sessionOptions = {
 	},
 };
 
-if (process.env.NODE_ENV === "production") {
-	sessionOptions.cookie.secure = true; // serve secure cookies
-}
+// if (process.env.NODE_ENV === "production") {
+// 	sessionOptions.cookie.secure = true; // serve secure cookies
+// }
