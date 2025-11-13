@@ -108,9 +108,10 @@ export class TaskController {
 				type: "success",
 				text: "The task was created successfully.",
 			};
+			await req.session.save();
 			res.redirect(".");
 		} catch (error) {
-			this.#handleErrorAndRedirect(error, req, res, "./create");
+			await this.#handleErrorAndRedirect(error, req, res, "./create");
 		}
 	}
 
@@ -124,7 +125,7 @@ export class TaskController {
 		try {
 			res.render("tasks/update", { viewData: req.doc.toObject() });
 		} catch (error) {
-			this.#handleErrorAndRedirect(error, req, res, "..");
+			await this.#handleErrorAndRedirect(error, req, res, "..");
 		}
 	}
 
@@ -176,9 +177,10 @@ export class TaskController {
 					text: "The task was not updated because there was nothing to update.",
 				};
 			}
+			await req.session.save();
 			res.redirect("..");
 		} catch (error) {
-			this.#handleErrorAndRedirect(error, req, res, "./update");
+			await this.#handleErrorAndRedirect(error, req, res, "./update");
 		}
 	}
 
@@ -192,7 +194,7 @@ export class TaskController {
 		try {
 			res.render("tasks/delete", { viewData: req.doc.toObject() });
 		} catch (error) {
-			this.#handleErrorAndRedirect(error, req, res, "..");
+			await this.#handleErrorAndRedirect(error, req, res, "..");
 		}
 	}
 
@@ -219,9 +221,10 @@ export class TaskController {
 				type: "success",
 				text: "The task was deleted successfully.",
 			};
+			await req.session.save();
 			res.redirect("..");
 		} catch (error) {
-			this.#handleErrorAndRedirect(error, req, res, "./delete");
+			await this.#handleErrorAndRedirect(error, req, res, "./delete");
 		}
 	}
 
@@ -233,9 +236,10 @@ export class TaskController {
 	 * @param {object} res - Express response object.
 	 * @param {string} path - The path to redirect to.
 	 */
-	#handleErrorAndRedirect(error, req, res, path) {
+	async #handleErrorAndRedirect(error, req, res, path) {
 		logger.error(error.message, { error });
 		req.session.flash = { type: "danger", text: error.message };
+		await req.session.save();
 		res.redirect(path);
 	}
 }
