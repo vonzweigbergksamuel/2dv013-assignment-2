@@ -151,7 +151,7 @@ services:
       - LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE=${LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE:-/usr/src/app/logs/uncaught-exception.log}
 
     ports:
-      - "3001:${EXPRESS_APP_PORT:-3002}"
+      - "${DOCKER_HOST_PORT:-3002}:${EXPRESS_APP_PORT:-3002}"
 
 volumes:
   logs:
