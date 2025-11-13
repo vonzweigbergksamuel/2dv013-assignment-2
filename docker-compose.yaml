@@ -24,6 +24,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-admin}
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   influxdb:
     container_name: influxdb
@@ -99,6 +104,7 @@ services:
     container_name: just-task-it
     build:
       context: .
+      dockerfile: Dockerfile.production
 
     image: just-task-it:latest
 
@@ -145,7 +151,7 @@ services:
       - LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE=${LOGGER_UNCAUGHT_EXCEPTION_LOG_FILE:-/usr/src/app/logs/uncaught-exception.log}
 
     ports:
-      - "${DOCKER_HOST_PORT:-3002}:${EXPRESS_APP_PORT:-3002}"
+      - "3001:${EXPRESS_APP_PORT:-3002}"
 
 volumes:
   logs:
