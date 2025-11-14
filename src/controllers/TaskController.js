@@ -108,7 +108,11 @@ export class TaskController {
 				type: "success",
 				text: "The task was created successfully.",
 			};
-			await req.session.save();
+			try {
+				await req.session.save();
+			} catch (err) {
+				logger.error("Failed to save session", { error: err });
+			}
 			res.redirect(".");
 		} catch (error) {
 			await this.#handleErrorAndRedirect(error, req, res, "./create");
@@ -177,7 +181,11 @@ export class TaskController {
 					text: "The task was not updated because there was nothing to update.",
 				};
 			}
-			await req.session.save();
+			try {
+				await req.session.save();
+			} catch (err) {
+				logger.error("Failed to save session", { error: err });
+			}
 			res.redirect("..");
 		} catch (error) {
 			await this.#handleErrorAndRedirect(error, req, res, "./update");
@@ -221,7 +229,11 @@ export class TaskController {
 				type: "success",
 				text: "The task was deleted successfully.",
 			};
-			await req.session.save();
+			try {
+				await req.session.save();
+			} catch (err) {
+				logger.error("Failed to save session", { error: err });
+			}
 			res.redirect("..");
 		} catch (error) {
 			await this.#handleErrorAndRedirect(error, req, res, "./delete");
@@ -239,7 +251,11 @@ export class TaskController {
 	async #handleErrorAndRedirect(error, req, res, path) {
 		logger.error(error.message, { error });
 		req.session.flash = { type: "danger", text: error.message };
-		await req.session.save();
+		try {
+			await req.session.save();
+		} catch (err) {
+			logger.error("Failed to save session", { error: err });
+		}
 		res.redirect(path);
 	}
 }
